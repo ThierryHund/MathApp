@@ -1,6 +1,6 @@
 # images
 
-## Demo deploy on firebase
+## Demo deployed on firebase
 ```
 https://booga-loo.firebaseapp.com/
 ```
