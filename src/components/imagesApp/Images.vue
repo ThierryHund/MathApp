@@ -1,7 +1,6 @@
 <template>
-    <div>
-        <!--<router-link class="item" to="/images/gallery">Images</router-link>-->
-        <!--<router-link class="item" to="/youtube">Youtube</router-link>-->
+    <div class="container">
+        <AppHeader></AppHeader>
         <div class="ui container">
             <router-view></router-view>
         </div>
@@ -9,10 +8,11 @@
 </template>
 
 <script>
+    import AppHeader from './AppHeader'
     export default{
       name: 'App',
       components: {
-
+        AppHeader
       }
     }
 </script>

@@ -25,7 +25,6 @@ export default {
     const promises = Array.from(images).map(image => {
       const formData = new FormData();
       formData.append('image', image);
-
       return axios.post(`${ROOT_URL}/3/image`, formData, {
         headers: {
           Authorization: `Bearer ${token}`
@@ -34,5 +33,13 @@ export default {
     })
     return Promise.all(promises);
   }
+  ,
+  deleteImage(image, token) {
+    return axios.delete(`${ROOT_URL}/3/image/${image.id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+    }
 };
 

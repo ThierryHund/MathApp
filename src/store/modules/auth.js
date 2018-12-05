@@ -19,12 +19,13 @@ const actions = {
     const query = qs.parse(hash.replace('#', ''));
     commit('setToken', query.access_token);
     window.localStorage.setItem('imgur_token', query.access_token);
-    router.push('/');
+    router.push('/images/gallery');
 
   },
   logout: ({ commit }) => {
     commit('setToken', null);
     window.localStorage.removeItem('imgur_token');
+    router.push('/images/gallery');
   }
 };
 
