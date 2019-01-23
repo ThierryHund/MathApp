@@ -42,7 +42,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        position:relative;
+        position: relative;
         transition: opacity 1s ease-in-out;
         opacity: 0;
         z-index: 100;
@@ -64,11 +64,11 @@
         padding: 5px;
         transition: opacity 1s ease-in-out;
         border-radius: 5px;
-        display: box;
+        display: block;
         justify-content: center;
         align-items: center;
-        position:relative;
-        margin:auto;
+        position: relative;
+        margin: auto;
         opacity: 0;
         display: flex;
         justify-content: center; /* align horizontal */

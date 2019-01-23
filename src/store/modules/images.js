@@ -22,7 +22,6 @@ const actions = {
     const { token } = rootState.auth;
     //call imgur API module
     const response = await api.uploadImages(images, token);
-
     //redirect user image list component
     //router.push('/');
   },
@@ -34,6 +33,14 @@ const actions = {
       commit('removeImage', [image])
     }
   },
+  async editImage({ rootState, commit }, image) {
+    const { token } = rootState.auth;
+    const response = await api.editImage(image, token);
+    if(response.data.success === true)
+    {
+      //commit('removeImage', [image])
+    }
+  }
 };
 
 const mutations = {

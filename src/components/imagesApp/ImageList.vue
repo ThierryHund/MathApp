@@ -1,26 +1,25 @@
 <template>
         <div v-if="isLoggedIn" class="image-container">
-            <!--<img class="ui card link" v-for="image in allImages" :key="image.id" :src="image.link" @click="deleteImage(image)">-->
-            <div class="ui card link" v-for="image in allImages" :key="image.id">
+            <div class="ui card " v-for="image in allImages" :key="image.id">
                 <div class="image">
                     <img :src="image.link">
                 </div>
-                <div v-if="image.title !== null" class="content">
+                <div class="content" v-if="image.title !== null">
                     <div class="description">
                         {{image.title}}
                     </div>
                 </div>
-                <div class="extra">
+                <div class="extra content">
                     <div class="action" @click="deleteImage(image)">
                         X
                     </div>
-                    <div class="action">
-                        edit
+                    <div class="action" @click="editImage(image)">
+                        E
                     </div>
                 </div>
             </div>
         </div>
-        <h2 v-else>Please log in to see you images !</h2>
+        <h2 v-else>Please log in with your Imgur account to see your images !</h2>
 </template>
 
 <script>
@@ -28,7 +27,7 @@
 
   export default{
     name: 'ImageList',
-    methods: mapActions(['fetchImages', 'deleteImage']),
+    methods: mapActions(['fetchImages', 'deleteImage', 'editImage']),
     created() {
       this.fetchImages();
     },
@@ -45,29 +44,29 @@
 
     .card{
         break-inside: avoid-column;
+        position: relative;
     }
 
-    .extra {
-        position: absolute;
-        display: none;
+    .ui.card>.extra, .ui.cards>.card>.extra.content{
+        position: absolute!important;
+        opacity: 1;
         width:100%;
-        height: 100%;
+        display: none;
+        flex-direction: row;
+        height: 50px;
         z-index: 100;
         text-align: center;
-        justify-content: center;
-        align-content: center;
-        vertical-align: center;
+        bottom: 0;
+        /*float: bottom;*/
     }
 
-    .extra > span{
-        line-height: 100%;
-        font-size: xx-large;
-        color:#eee;
+    .card:hover  > .extra.content{
+        display: flex;
+        justify-content: space-evenly;
     }
 
-    .card:hover >  .extra {
-        display: block;
-        z-index: 1000;
+    .card:hover .action{
+        cursor: pointer;
     }
 
     .card:hover >  .image {
@@ -75,8 +74,11 @@
     }
 
     .extra > .action{
+        line-height: 100%;
+        font-size: xx-large;
+        color: #eee;
         border-radius: 50%;
-        width:50px;
+        width: 50px;
         height: 50px;
         border: 5px solid #eee;
     }

@@ -1,16 +1,19 @@
 <template>
     <div>
-        <!--<router-link class="item" to="/images/gallery">Images</router-link>-->
-        <!--<router-link class="item" to="/youtube">Youtube</router-link>-->
-        <div class="ui container">
-            <router-view></router-view>
-        </div>
+        <router-view></router-view>
     </div>
 </template>
 
 <script>
-    export default{
+  export default{
       name: 'App',
+      data: function() {
+        return {
+          user: ""
+        }
+      },
+    beforeCreate() {
+    },
       components: {
 
       }

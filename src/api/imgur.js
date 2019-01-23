@@ -32,14 +32,25 @@ export default {
       })
     })
     return Promise.all(promises);
-  }
-  ,
+  },
+
   deleteImage(image, token) {
     return axios.delete(`${ROOT_URL}/3/image/${image.id}`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
-      })
-    }
+    })
+  },
+  editImage(image, token) {
+    return axios.post(`${ROOT_URL}/3/image/${image.id}`, {
+          title: 'testTitle'
+        }
+      ,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+       }
+    })
+  }
 };
 

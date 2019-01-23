@@ -50,6 +50,5 @@
 <style scoped>
     div{
         text-align: center;
-        /*margin: 20px*/
     }
 </style>
