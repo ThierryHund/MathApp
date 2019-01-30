@@ -14,7 +14,7 @@
                         <div v-if="type == 2 && j != 0  && i == 0"
                              class="retainedSousMain"
                              @click="addRetained(j)">{{retained[j]}}</div>
-                        <div v-if="(j !=  number1Array.length - 1) && type == 2 && j !=  numbers[0][1].length - 1 " class="retainedSousSub">{{retained[j + 1]}}</div>
+                        <div v-if="(j !=  number1Array.length - 1) && type == 2 &&  i != 0 && j !=  numbers[0][1].length - 1 " class="retainedSousSub">{{retained[j + 1]}}</div>
 
                 </div>
             </div>
@@ -92,26 +92,21 @@
         for(i = 1; i <= numbersInCalcul; i++)
         {
           let temp = this.getRandomInt(1,10000)
-          // if( i == 1)temp = this.getRandomInt(1,999)
           this.numbers.push([ temp, this.getArrayFromInt(temp)])
         }
-        
+        this.numbers.sort((x,y)=>{ return y[0] - x[0]})
+
+        //calcul sum or sum
         switch (this.type) {
           case type.ADDITION:
-            this.numbers.sort((x,y)=>{ return y[0] - x[0]})
             this.expectedResult = this.numbers.reduce((a, b) => a + b[0], 0)
             break;
           case type.SOUSTRACTION:
-            this.numbers.sort((x,y)=>{ return y[0] - x[0]})
-            // this.expectedResult = numbers.reduce((a, b) => a - b)
             this.numbers.forEach((value, index) => {this.expectedResult = index === 0 ? this.expectedResult = value[0] : this.expectedResult - value[0]}, this)
             break
         }
 
-
-        // this.number1Array = this.getArrayFromInt(this.number1);
-        // this.number2Array = this.getArrayFromInt(this.number2);
-
+        //make all array same lemght (for use in template)
         this.numbers.forEach((value, index) =>{
           if(index != 0){
               while(value[1].length != this.numbers[0][1].length)
@@ -120,11 +115,8 @@
               }
           }
         })
-        // while(this.number1Array.length != this.number2Array.length)
-        // {
-        //   this.number2Array.splice(0, 0, "");
-        // }
 
+        //calculate  resultArray nd retainedArray
         this.expectedResultArray = this.getArrayFromInt(this.expectedResult);
         this.maxDigit = this.numbers[0][1].length + 1;
         for(var i = 0, len = this.maxDigit; i < len; i += 1)
@@ -132,6 +124,8 @@
           this.userResultArray[i] = null;
           this.retained[i] = null;
         }
+
+        //focus on first digit to fill
         this.$nextTick(function() {
             this.reinitializeFocus()
         })

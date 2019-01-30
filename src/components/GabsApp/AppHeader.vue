@@ -54,7 +54,6 @@
     },
     computed:{
       isLogged(){
-        console.log(this.$store.getters.user.uid)
         return this.$store.getters.user.uid !== null
       }
     },
