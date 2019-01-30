@@ -8,13 +8,13 @@
                      :key="j"
                      v-bind:class="{ vibrate : bzzz }">
                         <p>{{nb1}}</p>
-                        <div v-if="(j !=  number1Array.length - 1) && type == 1 && i == 0 && j != numbers[0][1].length -  1"
+                        <div v-if="(j !=  numbers[0][1].length - 1) && type == 1 && i == 0 && j != numbers[0][1].length -  1"
                              class="retained"
                              @click="addRetained(j)">{{retained[j]}}</div>
                         <div v-if="type == 2 && j != 0  && i == 0"
                              class="retainedSousMain"
                              @click="addRetained(j)">{{retained[j]}}</div>
-                        <div v-if="(j !=  number1Array.length - 1) && type == 2 &&  i != 0 && j !=  numbers[0][1].length - 1 " class="retainedSousSub">{{retained[j + 1]}}</div>
+                        <div v-if="(j !=  numbers[0][1].length - 1) && type == 2 &&  i != 0 && j !=  numbers[0][1].length - 1 " class="retainedSousSub">{{retained[j + 1]}}</div>
 
                 </div>
             </div>
@@ -53,10 +53,7 @@
         type:null,
         isLoggedIn: false,
         numbers:[],
-        number1: null,
-        number2: null,
-        number1Array: [],
-        number2Array: [],
+
         maxDigit: null,
         userResultArray: [],
         expectedResult: null,
@@ -88,7 +85,7 @@
         this.numbers = [];
 
         //create custom numbers array
-        let numbersInCalcul = this.type == type.ADDITION ? this.getRandomInt(1,5) : 2
+        let numbersInCalcul = this.type == type.ADDITION ? this.getRandomInt(2,5) : 2
         for(i = 1; i <= numbersInCalcul; i++)
         {
           let temp = this.getRandomInt(1,10000)
