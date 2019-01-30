@@ -1,12 +1,17 @@
 <template>
     <div class="ui center aligned container root">
         <AppHeader></AppHeader>
+        <div class="userInfo" v-bind:class="{'shake-horizontal' : scoreIsUpdated}" v-if="this.$router.currentRoute.fullPath != '/math' && this.$router.currentRoute.fullPath != '/math/auth'">
+            <div class="content">
+                <img class="userIcon" :src="userLogged.userIconUrl" />
+                <i class="trophy icon"></i>
+                <div class="userScore">
+                    {{userLogged.userName}} score : {{!isNaN(userLogged.score) ? userLogged.score : 0 }}
+                </div>
+            </div>
+        </div>
         <div class="ui container" >
-            <router-view
-                    @updateScore="onUpdateResult"
-            >
-                    <!--@userAuth="userAuth"-->
-                    <!--@userScore="onUserScore"-->
+            <router-view @updateScore="onUpdateResult">
             </router-view>
         </div>
     </div>
@@ -29,7 +34,8 @@
         userName: null,
         userIconUrl: null,
         lastConnexion: null,
-        uid:null
+        uid:null,
+        scoreIsUpdated : false
       }
     },
     computed: {
@@ -55,68 +61,37 @@
     mounted() {
     },
     methods: {
-      // userAuth(user){
-      //   this.isLoggedIn = true;
-      //   this.user = user.displayName;
-      // },
-      // onSubmit() {
-      //   this.user = this.user.toLowerCase();
-      //   this.isLoggedIn = true;
-      //   this.getResult();
-      //   router.push('/math/addition');
-      //
-      // },
-      // onUserScore(score) {
-      //   this.storeUserData(score)
-      // },
-      onUpdateResult() {
-        // this.userScore = this.userScore + 1;
-        // this.storeUserData(this.userScore)
-        this.$store.dispatch('updateScore')
+      onUpdateResult(point) {
+        this.$store.dispatch('updateScore', point)
+        this.scoreIsUpdated = true
+        setTimeout(()=>{this.scoreIsUpdated = false}, 2000)
       },
-      storeUserData(userScore) {
-        let myObj = {score: userScore};
-        let myJSON = JSON.stringify(myObj);
-        window.localStorage.setItem("gabs_app" + "-" + this.user, myJSON);
-      },
-      cleanResult() {
-        window.localStorage.removeItem("gabs_app" + "-" + this.user);
-      },
-      getResult() {
-        let text = window.localStorage.getItem("gabs_app" + "-" + this.user);
-        if (text !== null) {
-          let obj = JSON.parse(text);
-          if (obj.hasOwnProperty('score')) {
-            this.userScore = obj.score;
-          }
-        }
-      }
     }
   }
 </script>
 
 <style scoped>
-    .userInfo {
-        text-align: left !important;
-        width: 100%;
-        border: #eee solid 2px;
-        border-radius: 5px;
-        padding: 5px;
-        margin: 5px 0 10px 0;
+
+    .userIcon{
+        width: 40px;
+        height: 40px;
+        border-radius: 20px;
+        display: inline-block;
+        margin:5px
     }
 
-    /*.container.root{*/
-    /*background-color: #dad1d5;*/
-    /*}*/
+    .userScore{
+        display:inline-block;
+    }
 
-    .labelled {
-        display: flex;
-        /* flex-direction: column;*/
-        align-items: stretch;
-        justify-content: center;
-        min-height: 100%;
-        margin-bottom: 10px;
-
+    .userInfo {
+        text-align: left;
+        width: 100%;
+        /*border: #eee solid 2px;*/
+        background-color: #B7D7D8;
+        /*border-radius: 5px;*/
+        /*padding: 5px;*/
+        margin: 0px 0 10px 0;
     }
 
     .labelled .label {
@@ -136,17 +111,12 @@
         flex-grow: 1;
     }
 
-    .button {
-        width: 100%;
-    }
-
     .container.ui.root {
         display: inline-block;
         position: relative;
         width: 100% !important;
         margin: 0 0 0 0 !important;
         padding: 0 0 0 0 !important;
-        /*margin: 0 25vw 0 25vw!important;*/
     }
 
     @media (max-width: 480px) {
@@ -154,11 +124,14 @@
             width: 100% !important;
             display: inline-block;
             position: relative;
-            /*width: 50vw;*/
             margin: 0 0 0 0 !important;
             padding: 0 0 0 0 !important;
         }
     }
+
+    /************************************/
+    /********   No Mobile   *************/
+    /************************************/
 
     @media screen and (min-width: 480px) {
         .container.ui.root {
@@ -167,8 +140,73 @@
             position: relative;
             margin: 0 0 0 0 !important;
             padding: 0 0 0 0 !important;
-            /*width: 50vw;*/
-            /*margin: 0 25vw 0 25vw!important;*/
+        }
+    }
+
+    /************************************/
+    /******  Animation class  ***********/
+    /************************************/
+
+    .shake-horizontal {
+        -webkit-animation: shake-horizontal 0.8s cubic-bezier(0.455, 0.030, 0.515, 0.955) both;
+        animation: shake-horizontal 0.8s cubic-bezier(0.455, 0.030, 0.515, 0.955) both;
+    }
+
+    @-webkit-keyframes shake-horizontal {
+        0%,
+        100% {
+            -webkit-transform: translateX(0);
+            transform: translateX(0);
+        }
+        10%,
+        30%,
+        50%,
+        70% {
+            -webkit-transform: translateX(-10px);
+            transform: translateX(-10px);
+        }
+        20%,
+        40%,
+        60% {
+            -webkit-transform: translateX(10px);
+            transform: translateX(10px);
+        }
+        80% {
+            -webkit-transform: translateX(8px);
+            transform: translateX(8px);
+        }
+        90% {
+            -webkit-transform: translateX(-8px);
+            transform: translateX(-8px);
+        }
+    }
+
+    @keyframes shake-horizontal {
+        0%,
+        100% {
+            -webkit-transform: translateX(0);
+            transform: translateX(0);
+        }
+        10%,
+        30%,
+        50%,
+        70% {
+            -webkit-transform: translateX(-10px);
+            transform: translateX(-10px);
+        }
+        20%,
+        40%,
+        60% {
+            -webkit-transform: translateX(10px);
+            transform: translateX(10px);
+        }
+        80% {
+            -webkit-transform: translateX(8px);
+            transform: translateX(8px);
+        }
+        90% {
+            -webkit-transform: translateX(-8px);
+            transform: translateX(-8px);
         }
     }
 </style>

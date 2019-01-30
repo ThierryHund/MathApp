@@ -37,6 +37,7 @@ const mutations = {
       else
       {
         //create first user
+        state.score = 0
         db.setDocument("users", state.uid, state)
       }
     }
@@ -49,8 +50,8 @@ const mutations = {
       state.score = 0
     }
   },
-  UpdateScore(state){
-    state.score = state.score + 1
+  UpdateScore(state, point){
+    state.score = parseInt(state.score) + parseInt(point)
     db.setDocument("users", state.uid, state)
   }
 }
@@ -59,8 +60,8 @@ const actions = {
   setCurrentUser: ({ commit }) => {
     commit('setUser', auth.user())
   },
-  updateScore: ({ commit }) => {
-    commit('UpdateScore')
+  updateScore: ({ commit }, point) => {
+    commit('UpdateScore', [point])
   }
 }
 

@@ -1,37 +1,34 @@
 <template>
     <div class="module_container">
-        <div class="ui icon message userInfo">
-            <div class="content">
-                <img class="userIcon" :src="userLogged.userIconUrl" />
-                <i class="trophy icon"></i>
-                <div class="userScore">
-                    {{userLogged.userName}} score : {{!isNaN(userLogged.score) ? userLogged.score : 0 }}
-                </div>
-            </div>
-        </div>
         <div class="calcul">
-            <div class="row">
-                <div class="figure" v-for="(nb1, index) in number1Array"
-                     :key="index"
+
+            <div class="row" v-for="(number, i) in numbers" :key="i">
+                <span v-if="i == numbers.length -  1" class="mathSign">{{type == 1 ? "+" : "-"}}</span>
+                <div class="figure" v-for="(nb1, j) in number[1]"
+                     :key="j"
                      v-bind:class="{ vibrate : bzzz }">
                         <p>{{nb1}}</p>
-                        <div v-if="index !=  number1Array.length - 1" class="retained" @click="addRetained(index)">{{retained[index]}}</div>
+                        <div v-if="(j !=  number1Array.length - 1) && type == 1 && i == 0 && j != numbers[0][1].length -  1"
+                             class="retained"
+                             @click="addRetained(j)">{{retained[j]}}</div>
+                        <div v-if="type == 2 && j != 0  && i == 0"
+                             class="retainedSousMain"
+                             @click="addRetained(j)">{{retained[j]}}</div>
+                        <div v-if="(j !=  number1Array.length - 1) && type == 2 && j !=  numbers[0][1].length - 1 " class="retainedSousSub">{{retained[j + 1]}}</div>
+
                 </div>
             </div>
-            <div class="last row">
-                <div class="figure" v-for="(nb2, index) in number2Array"
-                     :key="index"
-                     v-bind:class="{ vibrate : bzzz }">
-                    <p>{{nb2}}</p>
-                </div>
-            </div>
+
             <div class="separator"></div>
             <form v-on:submit.prevent="">
                 <div class="result">
                     <input ref="digit" class="figure"
                            v-bind:class="{ success: success, error: error, vibrate : bzzz }"
-                           :disabled="success" v-for="(digit, index) in maxDigit"
-                           :key="index" type="number"  pattern="[0-9]" v-model="userResultArray[index]"
+                           :disabled="success"
+                           v-for="(digit, index) in maxDigit"
+                           :key="index" type="number"
+                           pattern="[0-9]"
+                           v-model="userResultArray[index]"
                            @keydown="limitToOneDigit($event, index)"
                            min="0"
                            max="9">
@@ -44,11 +41,18 @@
 </template>
 
 <script>
+  var type = {
+    ADDITION: 1,
+    SOUSTRACTION: 2,
+  };
+
   export default{
     name: 'Addition',
     data: function(){
       return {
+        type:null,
         isLoggedIn: false,
+        numbers:[],
         number1: null,
         number2: null,
         number1Array: [],
@@ -73,28 +77,56 @@
         }
       }
     },
-    computed: {
-      userLogged() {
-        return this.$store.getters.user
-      }
-    },
     methods: {
       initializeData(){
+        //select type of calcul
+        this.type = this.getRandomInt(1,3) == 1 ? type.ADDITION : type.SOUSTRACTION
+
+        //initialize variable
         this.error = false;
         this.success = false;
-        this.number1 = this.getRandomInt(1,10000);
-        this.number2 = this.getRandomInt(1,10000);
-        this.expectedResult = this.number1 + this.number2;
+        this.numbers = [];
 
-        if(this.number1 <  this.number2){
-          let temp = this.number1;
-          this.number1 = this.number2;
-          this.number2 = temp;
+        //create custom numbers array
+        let numbersInCalcul = this.type == type.ADDITION ? this.getRandomInt(1,5) : 2
+        for(i = 1; i <= numbersInCalcul; i++)
+        {
+          let temp = this.getRandomInt(1,10000)
+          // if( i == 1)temp = this.getRandomInt(1,999)
+          this.numbers.push([ temp, this.getArrayFromInt(temp)])
         }
-        this.number1Array = this.getArrayFromInt(this.number1);
-        this.number2Array = this.getArrayFromInt(this.number2);
+        
+        switch (this.type) {
+          case type.ADDITION:
+            this.numbers.sort((x,y)=>{ return y[0] - x[0]})
+            this.expectedResult = this.numbers.reduce((a, b) => a + b[0], 0)
+            break;
+          case type.SOUSTRACTION:
+            this.numbers.sort((x,y)=>{ return y[0] - x[0]})
+            // this.expectedResult = numbers.reduce((a, b) => a - b)
+            this.numbers.forEach((value, index) => {this.expectedResult = index === 0 ? this.expectedResult = value[0] : this.expectedResult - value[0]}, this)
+            break
+        }
+
+
+        // this.number1Array = this.getArrayFromInt(this.number1);
+        // this.number2Array = this.getArrayFromInt(this.number2);
+
+        this.numbers.forEach((value, index) =>{
+          if(index != 0){
+              while(value[1].length != this.numbers[0][1].length)
+              {
+                value[1].splice(0, 0, "");
+              }
+          }
+        })
+        // while(this.number1Array.length != this.number2Array.length)
+        // {
+        //   this.number2Array.splice(0, 0, "");
+        // }
+
         this.expectedResultArray = this.getArrayFromInt(this.expectedResult);
-        this.maxDigit = this.number1Array.length > this.number2Array.length ? this.number1Array.length + 1 : this.number2Array.length + 1;
+        this.maxDigit = this.numbers[0][1].length + 1;
         for(var i = 0, len = this.maxDigit; i < len; i += 1)
         {
           this.userResultArray[i] = null;
@@ -150,7 +182,7 @@
         else{
           if(parseInt(additionResult) === this.expectedResult){
             this.success= true;
-            this.updateResult()
+            this.updateResult(1)
           }
           else{
             this.error= true;
@@ -188,15 +220,13 @@
             break;
         }
       },
-      updateResult(){
-        this.$emit('updateScore')
+      updateResult(point){
+        this.$emit('updateScore', point)
       },
       nextCalcul(){
         this.initializeData();
       },
       vibrate(){
-        // window.navigator.vibrate([100,30,100,30,100,30,200,30,200,30,200,30,100,30,100,30,100]); // Vibrate 'SOS' in Morse.
-
         this.bzzz = true
         setTimeout(
           () => {
@@ -220,18 +250,6 @@
         display: inline-block;
     }
 
-    .userIcon{
-        width: 40px;
-        height: 40px;
-        border-radius: 20px;
-        display: inline-block;
-        margin:5px
-    }
-
-    .userScore{
-        display:inline-block;
-    }
-
     .module_container{
         display: inline-block;
     }
@@ -243,8 +261,7 @@
         margin: 0px;
     }
 
-    .last.row::before{
-        content: "+";
+    .mathSign{
         line-height: 16vw;
         font-size: 10vw;
         color: #a5a3a3;
@@ -257,7 +274,7 @@
         height:16vw;
         text-align: center;
         vertical-align:middle;
-        border: #eee solid;
+        border: #d69c9c solid 2px;
         border-radius: 5px;
         margin:2px;
         z-index: 1000;
@@ -268,20 +285,20 @@
         height:100%;
         line-height: 14vw;
         font-size: xx-large;
+        background-color: #eae2de;
     }
 
     input.figure{
         position: relative;
+        border:solid 2px #d69c9c;
         display: block;
         width:16vw;
         height:16vw;
         text-align: center;
         vertical-align:middle;
-        border: #eee solid;
         border-radius: 5px;
         margin:2px;
         z-index: 1000;
-        /*line-height: 10vw;*/
         font-size: xx-large;
         top:0px;
         right: 0px;
@@ -294,8 +311,6 @@
         height: 5px;
         border: 5px #a5a3a3 solid;
         border-radius: 5px;
-        /*border-radius: 15px;*/
-        /*position: absolute;*/
         bottom: -1vw;
         content: '';
         z-index: 1000;
@@ -309,27 +324,56 @@
         width: 100%;
     }
 
-    .loggin {
-        display: inline-block;
-        position: relative;
-        margin:auto;
-    }
-
     .retained{
         position: absolute;
         top:-10px;
         right:3px;
         width: 15px;
         height: 15px;
-        border-width: 2px;
+        border-radius: 15px;
+        border:solid 2px #d69c9c;
+        background-color: white;
+        z-index: 1000;
+        line-height: 12px;
+        font-size: 12px;
+        cursor:pointer;
+        color: #ff946d;
+    }
+
+    .retainedSousMain{
+        position: absolute;
+        top:9.5vw;
+        right:9.5vw;
+        width: 15px;
+        height: 15px;
         border-radius: 15px;
         border-style: solid;
-        border-color: #eee;
+        background-color: white;
+        z-index: 1000;
+        line-height: 12px;
+        font-size: 12px;
+        cursor:pointer;
+        color: #ff946d;
+        border:solid 2px #d69c9c
+    }
+
+    .retainedSousSub
+    {
+        position: absolute;
+        top:9.5vw;
+        right:9.5vw;
+        width: 15px;
+        height: 15px;
+        border-width: 1px;
+        border-radius: 15px;
+        border:solid 2px #d69c9c;
         background-color: white;
         z-index: 1000;
         line-height: 12px;
         font-size: smaller;
         font-size: 12px;
+        cursor:pointer;
+        color: #ff946d;
     }
 
     .figure.error{
@@ -345,39 +389,11 @@
         margin: 5px 0 5px 0;
     }
 
-    .labelled{
-        display: flex;
-        /* flex-direction: column;*/
-        align-items:stretch;
-        justify-content: center;
-        min-height: 100%;
-    }
-
-    .labelled .label{
-        /*height: 100%;*/
-        border-bottom-right-radius: 0px;
-        border-top-right-radius: 0px;
-        margin-right: 0px;
-        flex-grow: 1;
-        vertical-align: middle;
-        display: flex;
-        align-items:center;
-    }
-
-    .labelled input{
-        border-bottom-left-radius: 0px;
-        border-top-left-radius: 0px;
-        flex-grow: 1;
-
-    }
+    /************************************/
+    /********   No Mobile   *************/
+    /************************************/
 
     @media screen and (min-width: 480px) {
-        .loggin{
-            display: inline-block;
-            position: relative;
-            width:50vw;
-            margin:auto;
-        }
         .calcul{
             display: inline-block;
             position: relative;
@@ -394,19 +410,29 @@
         .figure p{
             line-height: 7vw;
         }
-    }
 
-    @media screen and (min-width: 480px) {
-        .last.row::before {
-            content: "+";
+        .retainedSousMain{
+            top:5vw;
+            right:5vw;
+        }
+
+        .retainedSousSub
+        {
+            top:5vw;
+            right:5vw;
+        }
+
+        .mathSign{
             color: #a5a3a3;
             line-height: 8vw;
             font-size: 4vw;
         }
     }
 
-    /*.vibrate{  animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;*/
-        /*transform: translate3d(0, 0, 0);}*/
+
+    /************************************/
+    /******  Animation class  ***********/
+    /************************************/
 
     @-webkit-keyframes shake {
         0%, 100% {
@@ -493,13 +519,6 @@
         -moz-animation-fill-mode: both;
         -o-animation-fill-mode: both;
         animation-fill-mode: both;
-        /*-webkit-animation-iteration-count: infinite;*/
-        /*-moz-animation-iteration-count: infinite;*/
-        /*-o-animation-iteration-count: infinite;*/
-        /*animation-iteration-count: infinite;*/
         -webkit-transition-timing-function: cubic-bezier(.36,.07,.19,.97);
     }
-
-
-
 </style>

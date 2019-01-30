@@ -1,8 +1,10 @@
 <template>
     <div class="home">
-       Welcome to GabzApps
+        <h1>
+            Welcome to GabzApps
+        </h1>
 
-        <div class="ui icon message userInfo" v-for="(user, index) in users" :key="user.uid">
+        <div class="userInfo message ui" v-for="(user, index) in users" :key="user.uid">
             <div class="content">
                 <img class="userIcon" :src="user.userIconUrl" />
                 <i class="trophy icon"></i>
@@ -11,9 +13,6 @@
                 </div>
             </div>
         </div>
-        <!--<div v-for="(user, index) in users" :key="user.uid">-->
-            <!--{{user.userName}} : {{user.score}}-->
-        <!--</div>-->
     </div>
 </template>
 
@@ -29,11 +28,12 @@
     },
     created(){
       var self = this
-      let data = db.getDocuments("users").then(function(snap){
+      db.getDocuments("users").then(function(snap){
         snap.forEach((doc) => {
-          self.users.push(doc.data())
-          //console.log(doc.id, " => ", doc.data());
-        });
+          let data = doc.data();
+          if(data.userName != "Anonymous"){
+            self.users.push(data)}
+          })
       });
 
     },
@@ -42,6 +42,17 @@
 </script>
 
 <style scoped>
+    .userInfo{
+        text-align: left;
+        width: 100%;
+        background-color: #b7d7d8;
+        margin: 0px 0 10px 0;
+    }
+
+    .content{
+        background-color: #b7d7d8;
+    }
+
     .userIcon{
         width: 40px;
         height: 40px;
@@ -52,5 +63,6 @@
 
     .userScore{
         display:inline-block;
+        background-color: #b7d7d8;
     }
 </style>

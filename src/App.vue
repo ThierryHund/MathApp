@@ -19,3 +19,9 @@
       }
     }
 </script>
+
+<style>
+    body{
+        background-color: #eae2de;
+    }
+</style>

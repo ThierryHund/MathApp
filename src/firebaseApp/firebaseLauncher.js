@@ -42,13 +42,13 @@ const auth = {
   ui: null,
   firebasefirstListening: false,
   init() {
-      console.log("initAuth")
       firebase.initializeApp(config);
       this.uiConfig = {
         // signInSuccessUrl: '/math',
         signInOptions: [
           firebase.auth.GoogleAuthProvider.PROVIDER_ID,
           firebase.auth.EmailAuthProvider.PROVIDER_ID,
+          firebaseui.auth.AnonymousAuthProvider.PROVIDER_ID
         ]
       }
       this.ui = new firebaseui.auth.AuthUI(firebase.auth());
@@ -80,7 +80,7 @@ const auth = {
     return this.context ? firebase.auth().currentUser : null;
   },
   async logout() {
-    await firebase.auth().signOut();
+     var a = await firebase.auth().signOut();
     router.push('/math');
   }
 }
