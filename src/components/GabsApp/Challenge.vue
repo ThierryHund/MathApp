@@ -226,13 +226,13 @@
         top: 38px;
         opacity: 0;
         background-color: #eee;
-        min-width: 150px;
         color: black;
         padding: 10px;
         border-radius: 10px;
         transition: visibility 0.3s linear, opacity 0.3s linear;
         margin: 0 auto 0 auto;
-        width: auto;
+        width: 150px;
+        left:-20px;
         /*box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);*/
         /*-webkit-animation-name: fade;*/
         /*-webkit-animation-duration: 0.5s;*/
@@ -500,7 +500,10 @@
             margin: auto;
             display: inline-block;
             padding: 0 20px 0 20px;
+        }
 
+        .tooltip{
+            width: 100%;
         }
     }
 
