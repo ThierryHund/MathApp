@@ -7,14 +7,18 @@
                 <div class="figure" v-for="(nb1, j) in number[1]"
                      :key="j"
                      v-bind:class="{ vibrate : bzzz }">
-                        <p>{{nb1}}</p>
-                        <div v-if="(j !=  numbers[0][1].length - 1) && type == 1 && i == 0 && j != numbers[0][1].length -  1"
-                             class="retained"
-                             @click="addRetained(j)">{{retained[j]}}</div>
-                        <div v-if="type == 2 && j != 0  && i == 0"
-                             class="retainedSousMain"
-                             @click="addRetained(j)">{{retained[j]}}</div>
-                        <div v-if="(j !=  numbers[0][1].length - 1) && type == 2 &&  i != 0 && j !=  numbers[0][1].length - 1 " class="retainedSousSub">{{retained[j + 1]}}</div>
+                    <p>{{nb1}}</p>
+                    <div v-if="(j !=  numbers[0][1].length - 1) && type == 1 && i == 0 && j != numbers[0][1].length -  1"
+                         class="retained"
+                         @click="addRetained(j)">{{retained[j]}}
+                    </div>
+                    <div v-if="type == 2 && j != 0  && i == 0"
+                         class="retainedSousMain"
+                         @click="addRetained(j)">{{retained[j]}}
+                    </div>
+                    <div v-if="(j !=  numbers[0][1].length - 1) && type == 2 &&  i != 0 && j !=  numbers[0][1].length - 1 "
+                         class="retainedSousSub">{{retained[j + 1]}}
+                    </div>
 
                 </div>
             </div>
@@ -33,8 +37,10 @@
                            min="0"
                            max="9">
                 </div>
-                <button v-if="!success" type="submit" class="ui primary button" @click="checkResult()">Check result</button>
-                <button v-bind:type="success ? 'submit' : ''" class="ui primary button" @click="nextCalcul()">Next</button>
+                <button v-if="!success" type="submit" class="ui primary button" @click="checkResult()">Check result
+                </button>
+                <button v-if="typeof stepsDetails === 'undefined'" v-bind:type="success ? 'submit' : ''" class="ui positive button" @click="nextCalcul()">Next
+                </button>
             </form>
         </div>
     </div>
@@ -46,25 +52,28 @@
     SOUSTRACTION: 2,
   };
 
-  export default{
+  export default {
     name: 'Addition',
-    data: function(){
+    props: {
+      stepsDetails: Object,
+    },
+    data: function () {
       return {
-        type:null,
+        challengeIterationNumber: 1,
+        type: null,
         isLoggedIn: false,
-        numbers:[],
-
+        numbers: [],
         maxDigit: null,
         userResultArray: [],
         expectedResult: null,
         expectedResultArray: [],
-        retained:[],
+        retained: [],
         error: false,
         success: false,
         bzzz: false
       }
     },
-    mounted(){
+    mounted() {
       this.initializeData();
     },
     directives: {
@@ -75,23 +84,34 @@
       }
     },
     methods: {
-      initializeData(){
-        //select type of calcul
-        this.type = this.getRandomInt(1,3) == 1 ? type.ADDITION : type.SOUSTRACTION
+      initializeData() {
 
         //initialize variable
         this.error = false;
         this.success = false;
         this.numbers = [];
+        let numbersInCalcul = null;
 
-        //create custom numbers array
-        let numbersInCalcul = this.type == type.ADDITION ? this.getRandomInt(2,5) : 2
-        for(i = 1; i <= numbersInCalcul; i++)
-        {
-          let temp = this.getRandomInt(1,10000)
-          this.numbers.push([ temp, this.getArrayFromInt(temp)])
+        if (typeof this.stepsDetails !== 'undefined') {
+          this.type = this.stepsDetails.type === "additions" ? type.ADDITION : type.SOUSTRACTION
+          numbersInCalcul = this.type === type.ADDITION ? this.getRandomInt(this.stepsDetails.items.min, this.stepsDetails.items.max) : 2
         }
-        this.numbers.sort((x,y)=>{ return y[0] - x[0]})
+        else {
+          //select type of calcul
+          this.type = this.getRandomInt(1, 3) === 1 ? type.ADDITION : type.SOUSTRACTION
+
+          //select numbers of items
+          numbersInCalcul = this.type === type.ADDITION ? this.getRandomInt(2, 5) : 2
+        }
+
+        //create custom numbers custom array
+        for (i = 1; i <= numbersInCalcul; i++) {
+          let temp = this.getRandomInt(1, 10000)
+          this.numbers.push([temp, this.getArrayFromInt(temp)])
+        }
+        this.numbers.sort((x, y) => {
+          return y[0] - x[0]
+        })
 
         //calcul sum or sum
         switch (this.type) {
@@ -99,33 +119,33 @@
             this.expectedResult = this.numbers.reduce((a, b) => a + b[0], 0)
             break;
           case type.SOUSTRACTION:
-            this.numbers.forEach((value, index) => {this.expectedResult = index === 0 ? this.expectedResult = value[0] : this.expectedResult - value[0]}, this)
+            this.numbers.forEach((value, index) => {
+              this.expectedResult = index === 0 ? this.expectedResult = value[0] : this.expectedResult - value[0]
+            }, this)
             break
         }
 
-        //make all array same lemght (for use in template)
-        this.numbers.forEach((value, index) =>{
-          if(index != 0){
-              while(value[1].length != this.numbers[0][1].length)
-              {
-                value[1].splice(0, 0, "");
-              }
+        //make all array same lenght (for use in template)
+        this.numbers.forEach((value, index) => {
+          if (index != 0) {
+            while (value[1].length != this.numbers[0][1].length) {
+              value[1].splice(0, 0, "");
+            }
           }
         })
 
         //calculate  resultArray nd retainedArray
         this.expectedResultArray = this.getArrayFromInt(this.expectedResult);
         this.maxDigit = this.numbers[0][1].length + 1;
-        for(var i = 0, len = this.maxDigit; i < len; i += 1)
-        {
+        for (var i = 0, len = this.maxDigit; i < len; i += 1) {
           this.userResultArray[i] = null;
           this.retained[i] = null;
         }
 
-        //focus on first digit to fill
-        this.$nextTick(function() {
-            this.reinitializeFocus()
-        })
+        // //focus on first digit to fill
+        // this.$nextTick(function () {
+        //   this.reinitializeFocus()
+        // })
       },
       getRandomInt(min, max) {
         min = Math.ceil(min);
@@ -133,7 +153,7 @@
         let number = (Math.floor(Math.random() * (max - min)) + min);
         return number
       },
-      getArrayFromInt(number){
+      getArrayFromInt(number) {
         let output = [];
         let numberString = number.toString();
         for (var i = 0, len = numberString.length; i < len; i += 1) {
@@ -141,7 +161,7 @@
         }
         return output
       },
-      checkResult(){
+      checkResult() {
         let additionResult = "";
         let noDigit = true;
         let error = false;
@@ -152,31 +172,42 @@
           if ((this.userResultArray[i] === null || this.userResultArray[i] === "") && noDigit) {
             continue;
           }
-          else if(this.userResultArray[i] === null || this.userResultArray[i] === ""){
+          else if (this.userResultArray[i] === null || this.userResultArray[i] === "") {
             error = true;
             this.vibrate()
             this.reinitializeFocus()
 
             break;
           }
-          else if(!error)
-          {
+          else if (!error) {
             noDigit = false;
             additionResult += "" + this.userResultArray[i]
           }
         }
-        if(error || noDigit){
-          this.error= true;
+        if (error || noDigit) {
+          this.error = true;
           this.vibrate()
           this.reinitializeFocus()
         }
-        else{
-          if(parseInt(additionResult) === this.expectedResult){
-            this.success= true;
-            this.updateResult(1)
+        else {
+          if (parseInt(additionResult) === this.expectedResult) {
+            this.success = true;
+            if (typeof this.stepsDetails !== 'undefined') {
+              if(this.challengeIterationNumber === this.stepsDetails.number)
+              {
+                this.nextChallengeStep()
+              }
+              else{
+                this.challengeIterationNumber = this.challengeIterationNumber + 1
+                setTimeout(()=>{this.initializeData()},2000)
+              }
+            }else
+            {
+              this.updateResult(1)
+            }
           }
-          else{
-            this.error= true;
+          else {
+            this.error = true;
             this.reinitializeFocus()
             this.vibrate();
           }
@@ -186,6 +217,7 @@
         let newRetainedValue;
         newRetainedValue = this.retained[index] == null ? 1 : this.retained[index] == 9 ? null : this.retained[index] + 1;
         this.$set(this.retained, index, newRetainedValue)
+        // this.setFocus(index + 1)
       },
       limitToOneDigit(event, index) {
         switch (event.key) {
@@ -194,30 +226,34 @@
           case "ArrowUp":
             break
           case "ArrowRight":
-            if(event.target.nextElementSibling != null)event.target.nextElementSibling.focus();
+            if (event.target.nextElementSibling != null) event.target.nextElementSibling.focus();
             break;
           case "ArrowLeft":
-            if(event.target.previousElementSibling != null)event.target.previousElementSibling.focus();
+            if (event.target.previousElementSibling != null) event.target.previousElementSibling.focus();
             break;
           default:
             if (!isNaN(event.key)) {
               event.preventDefault();
               this.$set(this.userResultArray, index, event.key)
-              if(event.target.previousElementSibling != null)event.target.previousElementSibling.focus();
+              if (event.target.previousElementSibling != null) event.target.previousElementSibling.focus();
             }
-            else if(event.key != "Enter"){
+            else if (event.key != "Enter") {
               event.preventDefault()
             }
             break;
         }
       },
-      updateResult(point){
+      updateResult(point) {
         this.$emit('updateScore', point)
       },
-      nextCalcul(){
+      nextChallengeStep()
+      {
+        this.$emit('nextStep')
+      },
+      nextCalcul() {
         this.initializeData();
       },
-      vibrate(){
+      vibrate() {
         this.bzzz = true
         setTimeout(
           () => {
@@ -225,9 +261,13 @@
           }, 1000);
         window.navigator.vibrate(200);
       },
-      reinitializeFocus(){
+      reinitializeFocus() {
         //set focus
         let index = parseInt(this.maxDigit) - 1;
+        let input = this.$refs.digit[index];
+        input.focus();
+      },
+      setFocus(index) {
         let input = this.$refs.digit[index];
         input.focus();
       }
@@ -237,66 +277,62 @@
 
 <style scoped>
 
-    .module_container{
+    .module_container {
         display: inline-block;
     }
 
-    .module_container{
-        display: inline-block;
-    }
-
-    .row, .result{
+    .row, .result {
         display: flex;
         flex-direction: row;
         justify-content: flex-end;
         margin: 0px;
     }
 
-    .mathSign{
+    .mathSign {
         line-height: 16vw;
         font-size: 10vw;
         color: #a5a3a3;
     }
 
-    .figure{
+    .figure {
         position: relative;
         display: block;
-        width:16vw;
-        height:16vw;
+        width: 16vw;
+        height: 16vw;
         text-align: center;
-        vertical-align:middle;
+        vertical-align: middle;
         border: #d69c9c solid 2px;
         border-radius: 5px;
-        margin:2px;
+        margin: 2px;
         z-index: 1000;
     }
 
-    .figure p{
-        width:100%;
-        height:100%;
+    .figure p {
+        width: 100%;
+        height: 100%;
         line-height: 14vw;
         font-size: xx-large;
         background-color: #eae2de;
     }
 
-    input.figure{
+    input.figure {
         position: relative;
-        border:solid 2px #d69c9c;
+        border: solid 2px #d69c9c;
         display: block;
-        width:16vw;
-        height:16vw;
+        width: 16vw;
+        height: 16vw;
         text-align: center;
-        vertical-align:middle;
+        vertical-align: middle;
         border-radius: 5px;
-        margin:2px;
+        margin: 2px;
         z-index: 1000;
         font-size: xx-large;
-        top:0px;
+        top: 0px;
         right: 0px;
         cursor: pointer;
     }
 
-    .separator{
+    .separator {
         display: inline-block;
         width: 100%;
         height: 5px;
@@ -309,32 +345,32 @@
         font: 0.8vw Arial, sans-serif;
     }
 
-    .calcul{
+    .calcul {
         display: inline-block;
         position: relative;
-        width: 100%;
+        /*width: 100%;*/
     }
 
-    .retained{
+    .retained {
         position: absolute;
-        top:-10px;
-        right:3px;
+        top: -10px;
+        right: 3px;
         width: 15px;
         height: 15px;
         border-radius: 15px;
-        border:solid 2px #d69c9c;
+        border: solid 2px #d69c9c;
         background-color: white;
         z-index: 1000;
         line-height: 12px;
         font-size: 12px;
-        cursor:pointer;
+        cursor: pointer;
         color: #ff946d;
     }
 
-    .retainedSousMain{
+    .retainedSousMain {
         position: absolute;
-        top:9.5vw;
-        right:9.5vw;
+        top: 9.5vw;
+        right: 9.5vw;
         width: 15px;
         height: 15px;
         border-radius: 15px;
@@ -343,39 +379,38 @@
         z-index: 1000;
         line-height: 12px;
         font-size: 12px;
-        cursor:pointer;
+        cursor: pointer;
         color: #ff946d;
-        border:solid 2px #d69c9c
+        border: solid 2px #d69c9c
     }
 
-    .retainedSousSub
-    {
+    .retainedSousSub {
         position: absolute;
-        top:9.5vw;
-        right:9.5vw;
+        top: 9.5vw;
+        right: 9.5vw;
         width: 15px;
         height: 15px;
         border-width: 1px;
         border-radius: 15px;
-        border:solid 2px #d69c9c;
+        border: solid 2px #d69c9c;
         background-color: white;
         z-index: 1000;
         line-height: 12px;
         font-size: smaller;
         font-size: 12px;
-        cursor:pointer;
+        cursor: pointer;
         color: #ff946d;
     }
 
-    .figure.error{
+    .figure.error {
         border: red solid 3px;
     }
 
-    .figure.success{
+    .figure.success {
         border: green solid 3px;
     }
 
-    .button{
+    .button {
         width: 100%;
         margin: 5px 0 5px 0;
     }
@@ -385,41 +420,42 @@
     /************************************/
 
     @media screen and (min-width: 480px) {
-        .calcul{
+        .calcul {
             display: inline-block;
             position: relative;
-            width:100%;
+            /*width: 100%;*/
         }
-        .figure{
-            width:8vw;
-            height:8vw;
+
+        .figure {
+            width: 8vw;
+            height: 8vw;
         }
-        input.figure{
-            width:8vw;
-            height:8vw;
+
+        input.figure {
+            width: 8vw;
+            height: 8vw;
         }
-        .figure p{
+
+        .figure p {
             line-height: 7vw;
         }
 
-        .retainedSousMain{
-            top:5vw;
-            right:5vw;
+        .retainedSousMain {
+            top: 5vw;
+            right: 5vw;
         }
 
-        .retainedSousSub
-        {
-            top:5vw;
-            right:5vw;
+        .retainedSousSub {
+            top: 5vw;
+            right: 5vw;
         }
 
-        .mathSign{
+        .mathSign {
             color: #a5a3a3;
             line-height: 8vw;
             font-size: 4vw;
         }
     }
-
 
     /************************************/
     /******  Animation class  ***********/
@@ -510,6 +546,6 @@
         -moz-animation-fill-mode: both;
         -o-animation-fill-mode: both;
         animation-fill-mode: both;
-        -webkit-transition-timing-function: cubic-bezier(.36,.07,.19,.97);
+        -webkit-transition-timing-function: cubic-bezier(.36, .07, .19, .97);
     }
 </style>

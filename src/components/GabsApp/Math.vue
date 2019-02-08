@@ -11,7 +11,7 @@
             </div>
         </div>
         <div class="ui container" >
-            <router-view @updateScore="onUpdateResult">
+            <router-view @updateScore="onUpdateResult" @challengeVictory="challengeVictory">
             </router-view>
         </div>
     </div>
@@ -63,6 +63,11 @@
     methods: {
       onUpdateResult(point) {
         this.$store.dispatch('updateScore', point)
+        this.scoreIsUpdated = true
+        setTimeout(()=>{this.scoreIsUpdated = false}, 2000)
+      },
+      challengeVictory(point, challengeRules) {
+        this.$store.dispatch('challengeVictory', {"point" : point, "challengeRules" : challengeRules})
         this.scoreIsUpdated = true
         setTimeout(()=>{this.scoreIsUpdated = false}, 2000)
       },

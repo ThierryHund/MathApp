@@ -7,9 +7,9 @@
             </div>
         </div>
         <div class="calcul">
-            <div class="selector">
+            <div v-if="typeof stepsDetails === 'undefined'" class="selector">
                 <button @click="initializeData(0)" class="ui primary button">Random table</button>
-                <button @click="tableSelector()" class="ui primary button">Table selector</button>
+                <button @click="tableSelector()" class="ui positive button">Table selector</button>
             </div>
 
             <form v-on:submit.prevent="">
@@ -35,7 +35,7 @@
                                max="100"
                                v-model="table[index].userResult"
                                @keydown="limitDigit($event, calcul)"
-                               @keyup="triggerCheckResult($event, calcul)"
+                               @input="triggerCheckResult($event, calcul)"
                         >
                         <img v-bind:class="{ succesIcon: calcul.success}" class="bounce-in-fwd userIcon" :src="require('../../asset/little-goku-blue.png')" />
 
@@ -49,8 +49,12 @@
 <script>
   export default {
     name: 'Tables',
+    props: {
+      stepsDetails: null,
+    },
     data: function () {
       return {
+        challengeTableList: null,
         tableSelected: 0,
         nb1: 0,
         nb2: 0,
@@ -63,25 +67,50 @@
         isNumberSelectorDisplay: false,
       }
     },
+    watch: {
+      stepsDetails: function () {
+        this.initializeData()
+      },
+    },
     created() {
-      // this.initializeData();
+      if (typeof this.stepsDetails !== 'undefined')this.initializeData();
     },
     methods: {
       tableSelector() {
         this.isNumberSelectorDisplay = true;
       },
-      initializeData(nbTable) {
+      initializeData(nbTable = 0) {
         this.error = false;
         this.success = false;
         this.userResult = null
+        //tables selection before first step
+        if (typeof this.stepsDetails !== 'undefined') {
+          if(this.challengeTableList === null || this.challengeTableList.length === 0){
+            this.challengeTableList = [...this.stepsDetails.tablesList]
+            if(this.stepsDetails.randomizedFinal){
+              this.challengeTableList.push("*")
+            }
+          }
+          nbTable = this.challengeTableList.shift()
+        }
+        else{
+          nbTable = nbTable == 0 ? this.getRandomIntInclusive(2, 9) : nbTable
+        }
+
         this.table = []
-        nbTable = nbTable == 0 ? this.getRandomIntInclusive(2, 9) : nbTable
 
         for (var i = 1; i <= 10; i += 1) {
           if(nbTable == "*")
           {
+            let temp2
+            if(typeof this.stepsDetails !== 'undefined')
+            {
+              temp2 = this.stepsDetails.tablesList[Math.floor(Math.random()*this.stepsDetails.tablesList.length)];
+            }
+            else{
+              temp2 = this.getRandomIntInclusive(2, 9)
+            }
             let temp1 = this.getRandomIntInclusive(2, 9);
-            let temp2 = this.getRandomIntInclusive(2, 9)
             this.table.push({
               id: i,
               nb1: temp1,
@@ -128,7 +157,17 @@
                 behavior: 'smooth'
             }
             window.scrollTo(scrollOptions)
-            this.updateResult(5)
+            //if no challenge update score after each table
+            if(typeof this.stepsDetails === 'undefined')
+            {
+                this.updateResult(5)
+            }
+            else if(typeof this.stepsDetails !== 'undefined' && this.challengeTableList.length === 0){
+              this.nextChallengeStep()
+            }
+            else if(this.challengeTableList.length !== 0){
+              setTimeout(()=>{this.initializeData()},2000)
+            }
           }
           else this.setFocus(calcul.id)
         }
@@ -140,6 +179,10 @@
       updateResult(point) {
         this.$emit('updateScore', point)
       },
+      nextChallengeStep()
+      {
+        this.$emit('nextStep')
+      },
       vibrate(calcul) {
         calcul.bzzz = true
         setTimeout(
@@ -147,9 +190,6 @@
             calcul.bzzz = false
           }, 1000);
         window.navigator.vibrate(200);
-      },
-      nextCalcul() {
-        this.initializeData();
       },
       limitDigit(event, calcul) {
         switch (event.key) {
@@ -167,7 +207,7 @@
             break;
           default:
             if (!isNaN(event.key)) {
-              if (calcul.userResult !== null && calcul.userResult.length == 3) {
+              if (calcul.userResult !== null && calcul.userResult.length == calcul.result.toString().length) {
                 (event.preventDefault(), calcul.userResult = event.key)
               }
             }
@@ -177,36 +217,9 @@
             break;
         }
       },
-      //TODO refactor this stuff
-      limit1Digit(event) {
-        switch (event.key) {
-          case "ArrowDown":
-            break
-          case "ArrowUp":
-            break
-          case "ArrowRight":
-            break;
-          case "ArrowLeft":
-            break;
-          case "Enter":
-            break;
-          case "Backspace":
-            break;
-          default:
-            if (!isNaN(event.key) || event.key == "*") {
-              event.preventDefault();
-              this.tableSelected = event.key
-            }
-            else {
-              event.preventDefault()
-            }
-            break;
-        }
-      },
       triggerCheckResult(event, calcul) {
-        if (calcul.userResult.toString().length == calcul.result.toString().length) {
-          setTimeout(
-            () => {
+        //we also check calcul.success to avoid multi check result trigerred by keyup event
+        if (calcul.userResult !== null && calcul.userResult.toString().length == calcul.result.toString().length && !calcul.success) {
               this.checkResult(calcul);
               setTimeout(
                 () => {
@@ -215,8 +228,7 @@
                     calcul.error = false;
                     calcul.error = false;
                   }
-                }, 1000);
-            }, 1000);
+                }, 500);
         }
       },
       setFocus(index) {

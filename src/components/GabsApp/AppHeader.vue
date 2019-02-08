@@ -22,6 +22,10 @@
                         <router-link class="item" to="/math/tables" @click="isMenuDeployed = false">tables
                         </router-link>
                     </li>
+                    <li :class="{hidden : !isLogged}" @click="isMenuDeployed = !isMenuDeployed">
+                        <router-link class="item" to="/math/challenge" @click="isMenuDeployed = !isMenuDeployed">Challenges
+                        </router-link>
+                    </li>
                     <li :class="{hidden : !isLogged}" @click="isMenuDeployed = false; logout()">
                         <router-link class="item" to="/math" @click="isMenuDeployed = false">Logout
                         </router-link>
@@ -30,14 +34,8 @@
                         <router-link class="item" to="/math" @click="isMenuDeployed = false">Login
                         </router-link>
                     </li>
-                    <!--<li @click="isMenuDeployed = !isMenuDeployed">-->
-                        <!--<router-link class="item" to="/math/soustraction" @click="isMenuDeployed = !isMenuDeployed">-->
-                            <!--soustraction-->
-                        <!--</router-link>-->
-                    <!--</li>-->
                 </ul>
             </nav>
-
         </div>
     </header>
 </template>
@@ -199,7 +197,7 @@
             /*height: 0;*/
             -webkit-transition: max-height 0.5s ease-in; /* Safari */
             transition: max-height 0.5s ease-in;
-            z-index: 1001;
+            z-index: 2000;
             position: absolute;
             width: 100%;
             margin-top: 3.6em;
@@ -240,6 +238,7 @@
         .navbar {
             float: right;
             max-height: none;
+            z-index: 2000;
         }
 
         .navbar .menu {

@@ -5,7 +5,8 @@ const state = {
   userName: null,
   score : null,
   lastConnexion : null,
-  userIconUrl : null
+  userIconUrl : null,
+  challenge : []
 }
 
 const getters = {
@@ -22,7 +23,7 @@ const mutations = {
         state.userIconUrl = require("../../asset/anonymous-icon.jpg");
       }
       else {
-        state.userName = user.displayName;
+        state.userName = user.providerData[0].displayName;
         state.userIconUrl = user.photoURL;
         // state.lastConnexion = user.lastConnexion;
       }
@@ -33,11 +34,13 @@ const mutations = {
         data = data.data()
         state.lastConnexion = data.lastConnexion;
         state.score = data.score ? data.score : 0;
+        state.challenge = data.challenge ? data.challenge : [];
       }
       else
       {
         //create first user
         state.score = 0
+        state.challenge =  [];
         db.setDocument("users", state.uid, state)
       }
     }
@@ -48,12 +51,18 @@ const mutations = {
       state.lastConnexion = null;
       state.userIconUrl = null;
       state.score = 0
+      state.challenge =  [];
     }
   },
   UpdateScore(state, point){
     state.score = parseInt(state.score) + parseInt(point)
     db.setDocument("users", state.uid, state)
-  }
+  },
+  challengeVictory(state, payload){
+    state.score = parseInt(state.score) + parseInt(payload.point)
+    state.challenge.push(payload.challengeRules)
+    db.setDocument("users", state.uid, state)
+  },
 }
 
 const actions = {
@@ -62,6 +71,9 @@ const actions = {
   },
   updateScore: ({ commit }, point) => {
     commit('UpdateScore', [point])
+  },
+  challengeVictory({ commit }, payload){
+    commit('challengeVictory', payload)
   }
 }
 

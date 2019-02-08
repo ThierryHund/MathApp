@@ -2,7 +2,12 @@
     <div>
         <h1>Sign in</h1>
         <div id="firebaseui-auth-container"></div>
-        <!--<button class="ui primary button" @click="logAnonymously">anonymous user</button>-->
+        <div class="ui message disclaimer">
+            <strong>This Math training app allows you to sign in with a Google Account or anonymously through the guest button</strong>
+            <p>If you logged in with Google, your score will be displayed on the home screen.</p>
+        </div>
+
+
     </div>
 </template>
 
@@ -25,7 +30,9 @@
 </script>
 
 <style scoped>
-button{
+
+
+    button{
     direction: ltr;
     font-weight: 500;
     height: auto;
@@ -36,4 +43,10 @@ button{
     text-align: left;
     width: 100%;
 }
+
+    .disclaimer{
+        text-align: left;
+        max-width: 360px;
+        margin: auto;
+    }
 </style>

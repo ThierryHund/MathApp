@@ -1,0 +1,149 @@
+{
+  "rules": [
+    {
+      "id": 1,
+      "name": "Easy addition/substraction",
+      "usersInvolved": [
+        "tyery1@gmail.com"
+      ],
+      "steps": [
+        {
+          "id": 1,
+          "type": "additions",
+          "component": "additions",
+          "items": {
+            "min": 2,
+            "max": 2
+          },
+          "number": 5
+        },
+        {
+          "id": 3,
+          "type": "soustractions",
+          "component": "additions",
+          "number": 5
+        }
+      ],
+      "point": 15
+    },
+    {
+      "id": 2,
+      "name": "All tables",
+      "usersInvolved": [
+        "tyery1@gmail.com"
+      ],
+      "steps": [
+        {
+          "id": 1,
+          "type": "tables",
+          "component": "tables",
+          "tablesList": [
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "randomizedFinal": true
+        }
+      ],
+      "point": 40
+    },
+    {
+      "id": 3,
+      "name": "Mix",
+      "usersInvolved": [
+
+      ],
+      "steps": [
+        {
+          "id": 1,
+          "type": "tables",
+          "component": "tables",
+          "tablesList": [
+            6,
+            7,
+            8
+          ],
+          "randomizedFinal": true
+        },
+        {
+          "id": 2,
+          "type": "additions",
+          "component": "additions",
+          "items": {
+            "min": 2,
+            "max": 4
+          },
+          "number": 3
+        },
+        {
+          "id": 3,
+          "type": "soustractions",
+          "component": "additions",
+          "number": 3
+        }
+      ],
+      "point": 40
+    },
+    {
+      "id": 4,
+      "name": "for dev test addition",
+      "usersInvolved": [
+
+      ],
+      "steps": [
+        {
+          "id": 1,
+          "type": "additions",
+          "component": "additions",
+          "items": {
+            "min": 2,
+            "max": 2
+          },
+          "number": 1
+        }
+      ],
+      "point": 15
+    },
+    {
+      "id": 5,
+      "name": "Big tables",
+      "usersInvolved": [
+      ],
+      "steps": [
+        {
+          "id": 1,
+          "type": "tables",
+          "component": "tables",
+          "tablesList": [
+            5,6,7,8,9
+          ],
+          "randomizedFinal": true
+        }
+      ],
+      "point": 15
+    },
+    {
+      "id": 6,
+      "name": "Small tables",
+      "usersInvolved": [
+      ],
+      "steps": [
+        {
+          "id": 1,
+          "type": "tables",
+          "component": "tables",
+          "tablesList": [
+            2,3,4,5
+          ],
+          "randomizedFinal": true
+        }
+      ],
+      "point": 15
+    }
+  ]
+}

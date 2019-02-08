@@ -14,6 +14,7 @@ import Addition from './components/GabsApp/Addition';
 import Tables from './components/GabsApp/Tables';
 import Home from './components/GabsApp/Home';
 import Auth from './components/GabsApp/Auth';
+import Challenge from './components/GabsApp/Challenge';
 import auth , { db } from './firebaseApp/firebaseLauncher.js'
 import * as firebase from "firebase/app";
 
@@ -69,6 +70,13 @@ export const router = new VueRouter({
           path: '/math/auth',
           component: Auth,
           meta: { guestOnly: true }
+        },
+        {
+          // UserProfile will be rendered inside User's <router-view>
+          // when /user/:id/profile is matched
+          path: '/math/challenge',
+          component: Challenge,
+          meta: { requireAuth: true }
         }
     ]}
   ]
@@ -83,7 +91,6 @@ router.beforeEach((to, from, next) => {
     let currentUser = firebase.auth().currentUser;
     let requireAuth = to.matched.some(record => record.meta.requireAuth)
     let guestOnly = to.matched.some(record => record.meta.guestOnly)
-    // console.log(from.path, to.path, requireAuth, guestOnly, currentUser,)
     if (requireAuth && !currentUser) next('/math/auth')
     else if (guestOnly && currentUser) next('/math/')
     else next()
