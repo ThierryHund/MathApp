@@ -1,4 +1,6 @@
-# images
+# MathApp
+A math app for addistion soustractino and multiplication table
+build fith vue and firebase auth and firestore db
 
 ## Demo deployed on firebase
 ```
